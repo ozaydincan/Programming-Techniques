@@ -1,163 +1,152 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define PI 3.14
 
+int greatestCommonFactor(void);
+void printFibonacci(void);
 
-//Exercise 4
-
-/*
-float areaDiagonal(float d);
-float areaSide(float s);
-float areaRadius(float r);
+struct repetitions{
+    char ch;
+    int rep;
+};
+void printChars(struct repetitions *s, FILE *outfile);
+void getRepetitions(char *infile, char *outfile, struct repetitions *s);
+void decompress(char *infile, char *outfile);
 
 int main() {
-    char shape;
-    printf("Enter Q for square, I for circle: ");
-    scanf("%c", &shape);
-    fflush(stdin);
-    if (shape =='Q'){
-        printf("Enter D to compute by diagonal, enter S to compute by side then enter the length: ");
-        float a;
-        char type;
-        scanf("%c",&type);
-        scanf("%f", &a);
-        if (type=='D'){
-            printf("The are of the square is %.1f", areaDiagonal(a));
+    //int gcf = greatestCommonFactor();
+    //printf("GCF = %d", gcf);
+
+    //printFibonacci();
+
+    struct repetitions s;
+    getRepetitions("sources.txt","compressed.txt",&s);
+    decompress("compressed.txt", "decompressed.txt");
+
+    return 0;
+}
+
+//Exercise 1
+int greatestCommonFactor(void){
+    int num1, num2, gcf;
+    printf("Enter two numbers: ");
+    scanf("%d %d", &num1, &num2);
+    if (num2 > num1) {
+        int x = num1;
+        num1 = num2;
+        num2 = x;
+    }
+    while (1){
+        gcf = num1%num2;
+        num1 = num2;
+        num2 = gcf;
+        if (num1 % num2 == 0){
+            break;
         }
-        else if(type =='S'){
-            printf("The are of the square is %.1f", areaSide(a));
+    }
+    return gcf;
+}
+
+//Exercise 2
+void printFibonacci(void){
+    int num1 = 0, num2= 1, n;
+    printf("How many terms of the fibonacci sequence you want to print: ");
+    scanf("%d", &n);
+    if(n<=1){
+        printf("%d", num1);
+        exit(EXIT_SUCCESS);
+    }
+    else{
+        printf("%d\n%d\n",num1,num2);
+    }
+    for(int i = 0; i<n; i++){
+        int x = num2;
+        num2 = num2 + num1;
+        num1 = x;
+        printf("%d\n",num2);
+    }
+}
+
+//EXERCISE 3
+void getRepetitions(char *infile, char *outfile, struct repetitions *s){
+    FILE *fp = fopen(infile, "r");
+    if (!fp){
+        fprintf(stdout, "Problem with input file!");
+        exit(EXIT_FAILURE);
+    }
+
+    FILE *f_out = fopen(outfile, "w");
+    if (!f_out){
+        fprintf(stdout, "Problem with output file!");
+        exit(EXIT_FAILURE);
+    }
+    char curr= fgetc(fp), next;
+    s->rep = 0;
+    while (!feof(fp)){
+        next = fgetc(fp);
+        if (curr == next&& s->rep<9){
+            s->ch=curr;
+            s->rep++;
         }
-    } else if (shape =='I'){
-        float a;
-        char type;
-        fprintf(stdout, "Enter D to compute by diameter, enter R to compute by radius the enter the length: ");
-        scanf("\n%c%f", &type, &a);
-        if(type=='D'){
-            printf("The area of the circle is %.1f", areaRadius(a/2));
-        }else if(type =='R'){
-            printf("The area of the circle is %.1f", areaRadius(a));
+        else if(s->rep == 9){
+            printChars(s, f_out);
         }
         else{
-            fprintf(stdout, "Wrong input!");
-            exit(EXIT_FAILURE);
+            if(s->rep>0){
+                printChars(s, f_out);
+            }
+            else{
+                fprintf(f_out,"%c", curr);
+            }
         }
-    } else{
-        fprintf(stdout, "Wrong input!");
-        exit(EXIT_FAILURE);
+        curr=next;
     }
-    return 0;
-}
-
-float areaDiagonal(float d){
-    float A = (d*d)/2;
-    return A;
-};
-
-float areaSide(float s){
-    float A = (s*s);
-    return A;
-}
-
-
-float areaRadius(float r){
-    float A = PI *(r*r);
-    return A;
-}
-*/
-
-
-//Exercise 5
-
-/*
-struct elements {
-    float op1, op2, result;
-    char operand;
-};
-
-struct elements calculator(struct elements s);
-
-int main(){
-    struct elements s = calculator(s);
-    printf("%c %.2f", s.operand, s.result);
-    return 0;
-}
-
-struct elements calculator(struct elements s){
-    printf("Enter the operation and enter the numbers as floating point numbers with spaces in between: " );
-    s.operand = getchar();
-    scanf(" %f %f",&s.op1, &s.op2);
-    if (s.operand == '+'){
-        s.result = s.op1 + s.op2;
-    }
-    else if (s.operand == '-'){
-        s.result = s.op1 - s.op2;
-    }
-    else if (s.operand == '*'){
-        s.result = s.op1 * s.op2;
-    }
-    else if (s.operand == '/'){
-        s.result = s.op1 / s.op2;
-    }
-    else{
-        printf("Wrong input");
-        exit(EXIT_FAILURE);
-    }
-    return s;
-}
-*/
-
-//Exercise 6
-
-struct operations{
-    float op1, op2;
-    char operator;
-};
-
-void printToFile(struct operations *s, FILE *f_out);
-void readOperations(struct operations *s, FILE *fp, FILE *f_out);
-
-int main(void){
-    struct operations s;
-    FILE *fp, *f_out;
-    fp = fopen("operations.txt", "r");
-    if (!fp){
-        printf("Input file couldn't be opened!");
-        exit(EXIT_FAILURE);
-    }
-
-    f_out = fopen("results.txt", "w");
-    if (!f_out){
-        printf("Output file couldn't be opened!");
-        exit(EXIT_FAILURE);
-    }
-    readOperations(&s,  fp, f_out);
     fclose(fp);
     fclose(f_out);
-    return 0;
 }
 
-void readOperations(struct operations *s, FILE *fp, FILE *f_out){
-    while (!feof(fp)){
-        fscanf(fp,"%c %f %f\n", &s->operator, &s->op1, &s->op2);
-        printToFile(s, f_out);
-    }
-}
-
-void printToFile(struct operations *s, FILE *f_out){
-    if (s->operator == '+'){
-        fprintf(f_out,"%c %.2f\n", s->operator, s->op1 + s->op2);
-    }
-    else if(s->operator == '-'){
-        fprintf(f_out,"%c %.2f\n", s->operator, s->op1 - s->op2);
-    }
-    else if (s->operator == '*'){
-        fprintf(f_out,"%c %.2f\n", s->operator, s->op1 * s->op2);
-    }
-    else if(s->operator == '/'){
-        fprintf(f_out,"%c %.2f\n", s->operator, s->op1 / s->op2);
+void printChars(struct repetitions *s, FILE *outfile){
+    if (s->rep > 1){
+        fprintf(outfile, "%c!%d", s->ch, s->rep);
     }
     else{
-        printf("Wrong operator!");
+        for (int i = 0; i <= s->rep; i++){
+            fprintf(outfile, "%c", s->ch);
+        }
     }
+    s->rep = 0;
 
 }
+
+void decompress(char *infile, char *outfile){
+    struct repetitions dc;
+    FILE *fp = fopen(infile, "r");
+    if (!infile){
+        fprintf(stdout, "Problem with input file!");
+    }
+    FILE *f_out = fopen(outfile, "w");
+    if (!f_out){
+        fprintf(stdout, "Problem with output file!");
+    }
+    char curr= fgetc(fp);
+    while (!feof(fp)){
+        char next = fgetc(fp);
+        if(next == EOF){
+            break;
+        }
+        if (next == '!'){
+            next = fgetc(fp);
+            dc.ch=curr;
+            dc.rep = next -'0';
+            for (int i = 0; i <= dc.rep; i++) {
+                fprintf(f_out, "%c", dc.ch);
+            }
+            dc.rep = 0;
+            curr = fgetc(fp);
+        }
+        else{
+            fprintf(f_out,"%c", curr);
+            curr = next;
+        }
+    }
+}
+
