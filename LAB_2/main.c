@@ -148,5 +148,6 @@ void decompress(char *infile, char *outfile){
             curr = next;
         }
     }
+    fclose(fp);
 }
 
